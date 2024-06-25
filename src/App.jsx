@@ -1,34 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 function App() {
-  const createAndDownloadFile = () => {
-    // ข้อความที่ต้องการเขียนลงในไฟล์
-    const content = "hello world!";
+  const [inputValue, setInputValue] = useState("");
+  const [savedContent, setSavedContent] = useState("");
 
-    // สร้าง Blob ด้วยข้อความ
-    const blob = new Blob([content], { type: "text/plain" });
+  useEffect(() => {
+    // โหลดข้อมูลจาก Local Storage เมื่อคอมโพเนนต์ถูก mount
+    const storedContent = localStorage.getItem("fileContent");
+    if (storedContent) {
+      setSavedContent(storedContent);
+    }
+  }, []);
 
-    // สร้าง URL สำหรับ Blob
-    const url = URL.createObjectURL(blob);
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+  };
 
-    // สร้างลิงก์ชั่วคราวสำหรับดาวน์โหลดไฟล์
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "db.txt";
-
-    // เพิ่มลิงก์ในเอกสารและคลิกลิงก์
-    document.body.appendChild(link);
-    link.click();
-
-    // ลบลิงก์ออกจากเอกสารและยกเลิก URL
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+  const saveContent = () => {
+    const content = inputValue;
+    setSavedContent(content);
+    localStorage.setItem("fileContent", content);
   };
 
   return (
     <div>
-      <h1>Download File</h1>
-      <button onClick={createAndDownloadFile}>Download db.txt</button>
+      <h1>Save Text</h1>
+      <input
+        type="text"
+        value={inputValue}
+        onChange={handleInputChange}
+        placeholder="Enter some text"
+      />
+      <button onClick={saveContent}>Save text</button>
+      <p>Saved text: {savedContent}</p>
     </div>
   );
 }
